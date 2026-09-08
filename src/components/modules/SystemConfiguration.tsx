@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Building2, GraduationCap, Loader2, Palette, Plus, Save, Settings2, Tags, Trash2 } from "lucide-react";
+import { Building2, GraduationCap, Hash, Loader2, Palette, Plus, Save, Settings2, Tags, Trash2 } from "lucide-react";
 import type { ZodType } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,8 +53,11 @@ import {
   deleteSubject,
   getConfiguration,
   saveBranding,
+  saveNumberingSettings,
   saveTenantSettings,
 } from "@/lib/config.functions";
+import { NumberingSection } from "@/components/modules/NumberingSection";
+import type { NumberingSettings } from "@/lib/numbering";
 
 /* ----------------------------- helpers ----------------------------- */
 
@@ -116,6 +119,7 @@ export function SystemConfiguration() {
   const removeSubject = useServerFn(deleteSubject);
   const savePolicy = useServerFn(saveTenantSettings);
   const saveBrand = useServerFn(saveBranding);
+  const saveNumbering = useServerFn(saveNumberingSettings);
 
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -125,6 +129,7 @@ export function SystemConfiguration() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [settings, setSettings] = useState<TenantSettings[]>([]);
   const [branding, setBranding] = useState<SchoolBranding[]>([]);
+  const [numbering, setNumbering] = useState<NumberingSettings[]>([]);
   const [schoolId, setSchoolId] = useState("");
 
   const refresh = useCallback(async () => {
@@ -135,6 +140,7 @@ export function SystemConfiguration() {
     setSubjects(data.subjects as Subject[]);
     setSettings(data.settings as unknown as TenantSettings[]);
     setBranding(data.branding as SchoolBranding[]);
+    setNumbering(data.numbering as unknown as NumberingSettings[]);
     setSchoolId((current) => {
       const list = data.schools as School[];
       return list.some((s) => s.id === current) ? current : (list[0]?.id ?? "");
@@ -169,6 +175,7 @@ export function SystemConfiguration() {
   );
   const schoolSettings = settings.find((s) => s.school_id === schoolId) ?? null;
   const schoolBranding = branding.find((b) => b.school_id === schoolId) ?? null;
+  const schoolNumbering = numbering.find((n) => n.school_id === schoolId) ?? null;
 
   if (loading) {
     return (
@@ -220,6 +227,9 @@ export function SystemConfiguration() {
           <TabsTrigger value="policy">
             <Settings2 className="size-4" aria-hidden /> Tenant policy
           </TabsTrigger>
+          <TabsTrigger value="numbering">
+            <Hash className="size-4" aria-hidden /> Numbering
+          </TabsTrigger>
           <TabsTrigger value="branding">
             <Palette className="size-4" aria-hidden /> Branding
           </TabsTrigger>
@@ -269,6 +279,15 @@ export function SystemConfiguration() {
             settings={schoolSettings}
             busy={busy}
             onSave={(payload) => run(() => savePolicy({ data: payload }), "Configuration saved")}
+          />
+        </TabsContent>
+
+        <TabsContent value="numbering" className="mt-6">
+          <NumberingSection
+            school={school ?? null}
+            numbering={schoolNumbering}
+            busy={busy}
+            onSave={(payload) => run(() => saveNumbering({ data: payload }), "Numbering saved")}
           />
         </TabsContent>
 
