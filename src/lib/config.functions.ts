@@ -6,6 +6,7 @@ import {
   brandingSchema,
   educationLevelSchema,
   idSchema,
+  numberingSchema,
   schoolSchema,
   schoolTypeSchema,
   subjectSchema,
@@ -28,17 +29,19 @@ export const getConfiguration = createServerFn({ method: "GET" })
     await assertSuperAdmin(context.supabase, context.userId);
     const { supabase } = context;
 
-    const [types, levels, schools, subjects, settings, branding] = await Promise.all([
+    const [types, levels, schools, subjects, settings, branding, numbering] = await Promise.all([
       supabase.from("school_types").select("*").order("name"),
       supabase.from("education_levels").select("*").order("sort_order"),
       supabase.from("schools").select("*").order("name"),
       supabase.from("subjects").select("*").order("name"),
       supabase.from("tenant_settings").select("*"),
       supabase.from("school_branding").select("*"),
+      supabase.from("numbering_settings").select("*"),
     ]);
 
     const failure =
-      types.error ?? levels.error ?? schools.error ?? subjects.error ?? settings.error ?? branding.error;
+      types.error ?? levels.error ?? schools.error ?? subjects.error ?? settings.error ?? branding.error ??
+      numbering.error;
     if (failure) throw new Error(failure.message);
 
     return {
@@ -48,6 +51,7 @@ export const getConfiguration = createServerFn({ method: "GET" })
       subjects: subjects.data ?? [],
       settings: (settings.data ?? []).map((s) => ({ ...s, features: mergedFeatures(s.features as never) })),
       branding: branding.data ?? [],
+      numbering: numbering.data ?? [],
     };
   });
 
@@ -309,6 +313,40 @@ export const saveBranding = createServerFn({ method: "POST" })
     await logAudit(context.supabase, context.userId, {
       action: "branding_saved",
       description: "Updated school branding",
+      details: { schoolId: data.schoolId },
+    });
+    return { ok: true };
+  });
+
+/* ---------------------------- numbering ---------------------------- */
+
+export const saveNumberingSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => numberingSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    const { error } = await context.supabase.from("numbering_settings").upsert(
+      {
+        school_id: data.schoolId,
+        school_code: data.schoolCode,
+        admission_format: data.admissionFormat,
+        admission_total_digits: data.admissionTotalDigits,
+        admission_year_digits: data.admissionYearDigits,
+        admission_sequence_digits: data.admissionSequenceDigits,
+        admission_sequence_start: data.admissionSequenceStart,
+        employee_format: data.employeeFormat,
+        employee_total_digits: data.employeeTotalDigits,
+        employee_year_digits: data.employeeYearDigits,
+        employee_sequence_digits: data.employeeSequenceDigits,
+        employee_sequence_start: data.employeeSequenceStart,
+        employee_allocation_mode: data.employeeAllocationMode,
+      },
+      { onConflict: "school_id" },
+    );
+    if (error) throw new Error(error.message);
+    await logAudit(context.supabase, context.userId, {
+      action: "numbering_settings_saved",
+      description: "Updated admission and employee numbering rules",
       details: { schoolId: data.schoolId },
     });
     return { ok: true };

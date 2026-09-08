@@ -103,6 +103,40 @@ export const brandingSchema = z.object({
   showPoweredBy: z.boolean().default(true),
 });
 
+/* --------------------------- numbering --------------------------- */
+
+const numberFormat = trimmed(3, 60).regex(
+  /^[A-Z0-9\-/{}A-Za-z]*\{SEQ\}[A-Z0-9\-/{}A-Za-z]*$/,
+  "The template must include {SEQ}; you can also use {SCHOOL} and {YY}.",
+);
+
+export const numberingSchema = z
+  .object({
+    schoolId: z.string().uuid(),
+    schoolCode: trimmed(4, 4).regex(/^[0-9]{4}$/, "The school code must be exactly 4 digits."),
+    admissionFormat: numberFormat.default("{SCHOOL}{YY}{SEQ}"),
+    admissionTotalDigits: z.number().int().min(6).max(20),
+    admissionYearDigits: z.number().int().min(0).max(4),
+    admissionSequenceDigits: z.number().int().min(1).max(8),
+    admissionSequenceStart: z.number().int().min(0).max(99999999),
+    employeeFormat: numberFormat.default("{SCHOOL}{YY}{SEQ}"),
+    employeeTotalDigits: z.number().int().min(5).max(20),
+    employeeYearDigits: z.number().int().min(0).max(4),
+    employeeSequenceDigits: z.number().int().min(1).max(8),
+    employeeSequenceStart: z.number().int().min(0).max(99999999),
+    employeeAllocationMode: z.enum(["compact", "random"]),
+  })
+  .refine((v) => v.admissionSequenceStart < 10 ** v.admissionSequenceDigits, {
+    message: "The starting number does not fit in the sequence length.",
+    path: ["admissionSequenceStart"],
+  })
+  .refine((v) => v.employeeSequenceStart < 10 ** v.employeeSequenceDigits, {
+    message: "The starting number does not fit in the sequence length.",
+    path: ["employeeSequenceStart"],
+  });
+
+export type NumberingInput = z.infer<typeof numberingSchema>;
+
 export type SchoolInput = z.infer<typeof schoolSchema>;
 export type SubjectInput = z.infer<typeof subjectSchema>;
 export type TenantSettingsInput = z.infer<typeof tenantSettingsSchema>;
