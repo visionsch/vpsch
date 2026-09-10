@@ -756,7 +756,7 @@ function FeeDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [admissionId, setAdmissionId] = useState("");
-  const [term, setTerm] = useState(FEE_TYPES[0]!.label);
+  const [term, setTerm] = useState<string>(FEE_TYPES[0]!.label);
   const [amountDue, setAmountDue] = useState("");
   const [dueDate, setDueDate] = useState(today());
   const [status, setStatus] = useState<"pending" | "paid" | "overdue">("pending");
