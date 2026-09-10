@@ -79,6 +79,8 @@ function ModulePage() {
         <ParentChildren />
       ) : mod.id === "system-configuration" ? (
         <SystemConfiguration />
+      ) : mod.id === "financial-management" ? (
+        <FinancialManagement />
       ) : (
 
         <Panel title="Module placeholder">
