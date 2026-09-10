@@ -8,6 +8,7 @@ import { StaffManagement } from "@/components/modules/StaffManagement";
 import { AdmissionsManagement } from "@/components/modules/AdmissionsManagement";
 import { ParentChildren } from "@/components/modules/ParentChildren";
 import { SystemConfiguration } from "@/components/modules/SystemConfiguration";
+import { FinancialManagement } from "@/components/modules/FinancialManagement";
 
 
 export const Route = createFileRoute("/_authenticated/portal/$moduleId")({
@@ -78,6 +79,8 @@ function ModulePage() {
         <ParentChildren />
       ) : mod.id === "system-configuration" ? (
         <SystemConfiguration />
+      ) : mod.id === "financial-management" ? (
+        <FinancialManagement />
       ) : (
 
         <Panel title="Module placeholder">
