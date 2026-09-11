@@ -143,6 +143,7 @@ export function UserFormDialog({
   suggestedPassword?: string;
 }) {
   const editing = Boolean(account);
+  const { positions, departments } = useTenantOptions();
   const [form, setForm] = useState<UserFormValues>(emptyForm());
   const [error, setError] = useState<string | null>(null);
 
