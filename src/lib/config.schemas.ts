@@ -47,6 +47,19 @@ export const schoolSchema = z.object({
   code: upperCodeSchema,
   country: trimmed(2, 80),
   region: z.string().trim().max(80).default(""),
+  district: z.string().trim().max(120).default(""),
+  town: z.string().trim().max(120).default(""),
+  community: z.string().trim().max(120).default(""),
+  postalAddress: z.string().trim().max(200).default(""),
+  gpsAddress: z
+    .string()
+    .trim()
+    .max(30)
+    .default("")
+    .refine(
+      (v) => v === "" || /^[A-Za-z]{2}-\d{3,4}-\d{3,4}$/.test(v),
+      "Use a Ghana Post GPS address like GA-123-4567.",
+    ),
   timezone: timezone.default("UTC"),
   currency,
   locale,
