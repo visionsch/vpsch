@@ -361,3 +361,28 @@ export const saveNumberingSettings = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+/* ------------------------- tenant option lists ------------------------- */
+
+/**
+ * Positions, departments and schedule types configured under Tenant policy.
+ * Readable by any signed-in user so onboarding forms everywhere stay in sync
+ * with configuration instead of shipping hardcoded lists.
+ */
+export const getTenantOptions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("tenant_settings")
+      .select("school_id, positions, departments, schedule_types")
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+
+    return {
+      positions: data?.positions?.length ? data.positions : DEFAULT_POSITIONS,
+      departments: data?.departments?.length ? data.departments : DEFAULT_DEPARTMENTS,
+      scheduleTypes: data?.schedule_types?.length ? data.schedule_types : DEFAULT_SCHEDULE_TYPES,
+    };
+  });
