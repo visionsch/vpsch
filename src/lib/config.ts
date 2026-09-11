@@ -34,6 +34,11 @@ export interface School {
   code: string;
   country: string;
   region: string;
+  district: string;
+  town: string;
+  community: string;
+  postal_address: string;
+  gps_address: string;
   timezone: string;
   currency: string;
   locale: string;
