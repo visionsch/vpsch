@@ -21,12 +21,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { ACCESS_LABEL, ROLE_META, ROLES, type AccessLevel, type Role } from "@/lib/access";
-import { POSITIONS } from "@/lib/staff";
 import {
   ACCESS_DESCRIPTION,
   CLASSES,
   DEFAULT_PERMISSIONS,
-  DEPARTMENTS,
   GENDERS,
   PERMISSIONS,
   STATUSES,
@@ -125,6 +123,8 @@ function fromAccount(a: AccountRow): UserFormValues {
   };
 }
 
+import { useTenantOptions } from "@/hooks/useTenantOptions";
+
 export function UserFormDialog({
   open,
   onOpenChange,
@@ -143,6 +143,7 @@ export function UserFormDialog({
   suggestedPassword?: string;
 }) {
   const editing = Boolean(account);
+  const { positions, departments } = useTenantOptions();
   const [form, setForm] = useState<UserFormValues>(emptyForm());
   const [error, setError] = useState<string | null>(null);
 
@@ -350,7 +351,7 @@ export function UserFormDialog({
                     <SelectValue placeholder="Select position" />
                   </SelectTrigger>
                   <SelectContent>
-                    {POSITIONS.map((p) => (
+                    {positions.map((p) => (
                       <SelectItem key={p} value={p}>
                         {p}
                       </SelectItem>
@@ -397,7 +398,7 @@ export function UserFormDialog({
                 <SelectValue placeholder="Select department" />
               </SelectTrigger>
               <SelectContent>
-                {DEPARTMENTS.map((d) => (
+                {departments.map((d) => (
                   <SelectItem key={d} value={d}>
                     {d}
                   </SelectItem>

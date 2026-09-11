@@ -38,12 +38,11 @@ import {
 import {
   currency,
   OFFER_STATUSES,
-  POSITIONS,
   RATINGS,
   REVIEW_PERIODS,
-  SCHEDULE_TYPES,
 } from "@/lib/staff";
-import { DEPARTMENTS, generateSecurePassword } from "@/lib/user-management";
+import { generateSecurePassword } from "@/lib/user-management";
+import { useTenantOptions } from "@/hooks/useTenantOptions";
 import { UserFormDialog, type UserFormValues } from "./UserFormDialog";
 
 interface StaffRow {
@@ -97,6 +96,7 @@ const OFFER_STYLE: Record<string, string> = {
 
 export function StaffManagement() {
   const { profile } = useSession();
+  const { positions, departments, scheduleTypes } = useTenantOptions();
   const isAdmin = profile?.role === "super_admin" || profile?.role === "school_manager";
 
   const fetchOverview = useServerFn(getStaffOverview);
@@ -430,12 +430,12 @@ export function StaffManagement() {
             </div>
             <div className="space-y-2">
               <Label>Schedule type</Label>
-              <Select name="scheduleType" required defaultValue="regular">
+              <Select key={scheduleTypes[0]} name="scheduleType" required defaultValue={scheduleTypes[0] ?? "regular"}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {SCHEDULE_TYPES.map((t) => (
+                  {scheduleTypes.map((t) => (
                     <SelectItem key={t} value={t} className="capitalize">
                       {t}
                     </SelectItem>
@@ -497,12 +497,12 @@ export function StaffManagement() {
             </div>
             <div className="space-y-2">
               <Label>Position</Label>
-              <Select name="position" required defaultValue="Teacher">
+              <Select key={positions[0]} name="position" required defaultValue={positions[0] ?? "Teacher"}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {POSITIONS.map((p) => (
+                  {positions.map((p) => (
                     <SelectItem key={p} value={p}>
                       {p}
                     </SelectItem>
@@ -618,7 +618,7 @@ export function StaffManagement() {
           </div>
           <div className="mt-6 space-y-3">
             <h3 className="text-sm font-semibold">Department distribution</h3>
-            {DEPARTMENTS.map((d) => {
+            {departments.map((d) => {
               const count = staff.filter((s) => s.department === d).length;
               if (count === 0) return null;
               const pct = Math.round((count / Math.max(staff.length, 1)) * 100);

@@ -100,6 +100,11 @@ const EMPTY_SCHOOL = {
   code: "",
   country: "",
   region: "",
+  district: "",
+  town: "",
+  community: "",
+  postalAddress: "",
+  gpsAddress: "",
   timezone: "UTC",
   currency: "USD",
   locale: "en-US",
@@ -376,6 +381,21 @@ function SchoolsSection({
         <Field label="Region / state" error={errors["region"]}>
           <Input value={form.region} onChange={(e) => set("region", e.target.value)} />
         </Field>
+        <Field label="District" error={errors["district"]}>
+          <Input value={form.district} onChange={(e) => set("district", e.target.value)} />
+        </Field>
+        <Field label="Town / village" error={errors["town"]}>
+          <Input value={form.town} onChange={(e) => set("town", e.target.value)} />
+        </Field>
+        <Field label="Community / area" error={errors["community"]}>
+          <Input value={form.community} onChange={(e) => set("community", e.target.value)} />
+        </Field>
+        <Field label="Postal address" error={errors["postalAddress"]}>
+          <Input placeholder="P.O. Box 123, Accra" value={form.postalAddress} onChange={(e) => set("postalAddress", e.target.value)} />
+        </Field>
+        <Field label="GPS address" error={errors["gpsAddress"]}>
+          <Input placeholder="GA-123-4567" value={form.gpsAddress} onChange={(e) => set("gpsAddress", e.target.value)} />
+        </Field>
         <Field label="Timezone" error={errors["timezone"]}>
           <Input
             placeholder="Africa/Accra"
@@ -431,6 +451,11 @@ function SchoolsSection({
                 <p className="text-sm text-muted-foreground">
                   {types.find((t) => t.code === s.type_code)?.name ?? s.type_code} · {s.country}
                   {s.region ? `, ${s.region}` : ""}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {[s.community, s.town, s.district].filter(Boolean).join(" · ")}
+                  {s.gps_address ? ` · GPS ${s.gps_address}` : ""}
+                  {s.postal_address ? ` · ${s.postal_address}` : ""}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {s.currency} · {s.locale} · {s.timezone} · {s.level_codes.length} levels

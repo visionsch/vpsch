@@ -86,6 +86,11 @@ export const createSchool = createServerFn({ method: "POST" })
         code: data.code,
         country: data.country,
         region: data.region ?? "",
+        district: data.district ?? "",
+        town: data.town ?? "",
+        community: data.community ?? "",
+        postal_address: data.postalAddress ?? "",
+        gps_address: data.gpsAddress ?? "",
         timezone: data.timezone ?? "UTC",
         currency: data.currency,
         locale: data.locale,
@@ -142,6 +147,11 @@ export const updateSchool = createServerFn({ method: "POST" })
         ...(rest.code !== undefined ? { code: rest.code } : {}),
         ...(rest.country !== undefined ? { country: rest.country } : {}),
         ...(rest.region !== undefined ? { region: rest.region } : {}),
+        ...(rest.district !== undefined ? { district: rest.district } : {}),
+        ...(rest.town !== undefined ? { town: rest.town } : {}),
+        ...(rest.community !== undefined ? { community: rest.community } : {}),
+        ...(rest.postalAddress !== undefined ? { postal_address: rest.postalAddress } : {}),
+        ...(rest.gpsAddress !== undefined ? { gps_address: rest.gpsAddress } : {}),
         ...(rest.timezone !== undefined ? { timezone: rest.timezone } : {}),
         ...(rest.currency !== undefined ? { currency: rest.currency } : {}),
         ...(rest.locale !== undefined ? { locale: rest.locale } : {}),
@@ -350,4 +360,29 @@ export const saveNumberingSettings = createServerFn({ method: "POST" })
       details: { schoolId: data.schoolId },
     });
     return { ok: true };
+  });
+
+/* ------------------------- tenant option lists ------------------------- */
+
+/**
+ * Positions, departments and schedule types configured under Tenant policy.
+ * Readable by any signed-in user so onboarding forms everywhere stay in sync
+ * with configuration instead of shipping hardcoded lists.
+ */
+export const getTenantOptions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("tenant_settings")
+      .select("school_id, positions, departments, schedule_types")
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+
+    return {
+      positions: data?.positions?.length ? data.positions : DEFAULT_POSITIONS,
+      departments: data?.departments?.length ? data.departments : DEFAULT_DEPARTMENTS,
+      scheduleTypes: data?.schedule_types?.length ? data.schedule_types : DEFAULT_SCHEDULE_TYPES,
+    };
   });
