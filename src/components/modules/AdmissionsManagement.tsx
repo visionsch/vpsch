@@ -260,6 +260,10 @@ export function AdmissionsManagement() {
                   <td className="p-3">{String(r["parent_email"] ?? "")}</td>
                   <td className="p-3">
                     <div className="flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setViewing(r)}>
+                        <Eye className="size-3.5" aria-hidden />
+                        <span className="ml-1">View</span>
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"
