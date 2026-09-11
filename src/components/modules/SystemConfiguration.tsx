@@ -453,6 +453,11 @@ function SchoolsSection({
                   {s.region ? `, ${s.region}` : ""}
                 </p>
                 <p className="text-xs text-muted-foreground">
+                  {[s.community, s.town, s.district].filter(Boolean).join(" · ")}
+                  {s.gps_address ? ` · GPS ${s.gps_address}` : ""}
+                  {s.postal_address ? ` · ${s.postal_address}` : ""}
+                </p>
+                <p className="text-xs text-muted-foreground">
                   {s.currency} · {s.locale} · {s.timezone} · {s.level_codes.length} levels
                 </p>
               </div>
