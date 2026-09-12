@@ -388,7 +388,77 @@ export function AdmissionsManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ViewAdmissionDialog
+        row={viewing}
+        onClose={() => setViewing(null)}
+        onEdit={(r) => {
+          setViewing(null);
+          setEditing(r);
+          setOpen(true);
+        }}
+      />
     </Tabs>
+  );
+}
+
+function ViewAdmissionDialog({
+  row,
+  onClose,
+  onEdit,
+}: {
+  row: Row | null;
+  onClose: () => void;
+  onEdit: (r: Row) => void;
+}) {
+  const values = row ? fromRow(row) : null;
+
+  return (
+    <Dialog open={!!row} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{String(row?.["student_name"] ?? "Admission details")}</DialogTitle>
+          <DialogDescription>
+            Admission {String(row?.["admission_number"] ?? "")} ·{" "}
+            {String(row?.["class_admitted"] ?? "")}
+          </DialogDescription>
+        </DialogHeader>
+
+        {values && (
+          <div className="space-y-6">
+            {ADMISSION_TABS.map((tab, i) => (
+              <section key={tab.title} className="rounded-lg border border-border p-4">
+                <h3 className="mb-3 text-sm font-semibold">
+                  Step {i + 1} — {tab.title}
+                </h3>
+                <dl className="grid gap-3 sm:grid-cols-2">
+                  {tab.fields
+                    .filter(
+                      (f) =>
+                        !f.conditional || values[f.conditional.field] === f.conditional.value,
+                    )
+                    .map((f) => (
+                      <div key={f.name}>
+                        <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          {f.label}
+                        </dt>
+                        <dd className="mt-0.5 text-sm">{values[f.name] || "—"}</dd>
+                      </div>
+                    ))}
+                </dl>
+              </section>
+            ))}
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+          {row && <Button onClick={() => onEdit(row)}>Edit</Button>}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
