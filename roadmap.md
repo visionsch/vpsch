@@ -6,3 +6,4 @@
 - [x] Staff Management scheduling: load Schedule type from Tenant policy settings
 - [x] Port uploaded attendance.html into /portal/attendance
 - [x] Admissions list: View action showing full step 1-4 details
+- [x] Port uploaded assessment.html into /portal/assessment

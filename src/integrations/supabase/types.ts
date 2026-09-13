@@ -904,6 +904,56 @@ export type Database = {
           },
         ]
       }
+      student_assessments: {
+        Row: {
+          admission_id: string
+          assessment_type: string
+          class_name: string
+          created_at: string
+          id: string
+          out_of: number
+          remark: string
+          score: number
+          subject: string
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          admission_id: string
+          assessment_type?: string
+          class_name?: string
+          created_at?: string
+          id?: string
+          out_of?: number
+          remark?: string
+          score?: number
+          subject: string
+          term?: string
+          updated_at?: string
+        }
+        Update: {
+          admission_id?: string
+          assessment_type?: string
+          class_name?: string
+          created_at?: string
+          id?: string
+          out_of?: number
+          remark?: string
+          score?: number
+          subject?: string
+          term?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_assessments_admission_id_fkey"
+            columns: ["admission_id"]
+            isOneToOne: false
+            referencedRelation: "admissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_attendance: {
         Row: {
           admission_id: string
